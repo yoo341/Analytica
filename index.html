@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Analytica</title>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f6b5c">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.9.6/jstat.min.js"></script>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d2a26;--mu:#66736e;--ac:#0f6b5c;--ac2:#e8f2ef;--bd:#dcdad2;--wa:#b4570b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121816;--card:#1a2320;--tx:#e7eeeb;--mu:#98a8a2;--ac:#4fc3a9;--ac2:#1f302b;--bd:#2c3a35;--wa:#f0a05a}}
+:root[data-theme="dark"]{--bg:#121816;--card:#1a2320;--tx:#e7eeeb;--mu:#98a8a2;--ac:#4fc3a9;--ac2:#1f302b;--bd:#2c3a35;--wa:#f0a05a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 Georgia,'Times New Roman',serif}
+.w{max-width:960px;margin:0 auto;padding:18px}
+h1{font-size:30px;margin:0;letter-spacing:-.5px}h1 span{color:var(--ac)}
+.sub{color:var(--mu);font-family:system-ui,sans-serif;font-size:13px;margin:2px 0 14px}
+.tabs{display:flex;gap:6px;margin-bottom:14px;font-family:system-ui,sans-serif}
+.tabs button,.btn,.chip{font:600 13px system-ui,sans-serif;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on,.btn,.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.btn.g{background:var(--card);color:var(--tx);border-color:var(--bd)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+label{font:600 12px system-ui,sans-serif;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;display:block;margin:0 0 6px}
+textarea,input[type=file]{width:100%;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);padding:10px;font:13px ui-monospace,Menlo,monospace}
+textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:700px){.g2{grid-template-columns:1fr}}
+.sc{display:flex;align-items:center;gap:8px;font:13px system-ui,sans-serif;margin:6px 0}.sc b{width:60px}
+.bar{flex:1;height:10px;background:var(--ac2);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+.pick{border:2px solid var(--ac);background:var(--ac2)}
+.sc.top b{color:var(--ac)}
+.ov{overflow-x:auto}table{border-collapse:collapse;font:13px system-ui,sans-serif;width:100%}th,td{border-bottom:1px solid var(--bd);padding:5px 8px;text-align:left;white-space:nowrap}
+pre{background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;overflow-x:auto;font:12.5px/1.5 ui-monospace,Menlo,monospace;margin:8px 0 0}
+.tag{font:11px system-ui,sans-serif;background:var(--ac2);color:var(--ac);padding:2px 7px;border-radius:10px;margin-right:4px}
+.mu{color:var(--mu);font-size:13px}.wa{color:var(--wa)}
+details{border-bottom:1px solid var(--bd);padding:8px 0}summary{cursor:pointer;font-weight:bold}
+h3{margin:0 0 6px;font-size:18px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;z-index:9;padding:env(safe-area-inset-top,0) 0 0}
+.ms{background:var(--card);width:100%;max-width:480px;border-radius:18px 18px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px))}
+.pl{display:block;width:100%;text-align:left;margin:8px 0;padding:12px;border:2px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:600 14px system-ui,sans-serif;cursor:pointer}
+.pl.b{border-color:var(--ac)}.pl small{display:block;font-weight:400;color:var(--mu)}
+</style></head><body><div class="w">
+<h1>Analytica<span>.</span></h1>
+<p class="sub">Describe your analysis, paste your data. Analytica picks the test and the best tool (SPSS, R or Excel), runs it, and teaches you why.</p>
+<div class="tabs"><button id="t1" class="on" onclick="tab(1)">Analyze</button><button id="t2" onclick="tab(2)">Learn</button><button id="pb" class="btn" style="margin-left:auto" onclick="Billing.show()">Go Pro</button></div>
+
+<div id="p1">
+<div class="card">
+<label>Your level</label>
+<div class="row" id="lv"></div>
+<label style="margin-top:12px">What do you want to find out?</label>
+<textarea id="ins" placeholder="e.g. Does exam score differ between teaching methods?"></textarea>
+<label style="margin-top:12px">Data (paste CSV/TSV with header row, or upload)</label>
+<textarea id="dat" placeholder="group,score,hours&#10;A,67,5&#10;B,72,7"></textarea>
+<div class="row"><input type="file" id="fl" accept=".csv,.tsv,.txt" style="flex:1"><button class="btn g" onclick="sample()">Load sample</button><button class="btn" onclick="run()">Analyze</button></div>
+</div>
+<div id="out"></div>
+</div>
+
+<div id="p2" style="display:none">
+<div class="card"><h3>Which test should I use?</h3>
+<div class="ov"><table><tr><th>Question</th><th>Data</th><th>Test</th></tr>
+<tr><td>Compare 2 groups</td><td>1 numeric, 1 binary group</td><td>Independent t-test (Mann-Whitney if non-normal)</td></tr>
+<tr><td>Compare 3+ groups</td><td>1 numeric, 1 group of 3+</td><td>One-way ANOVA (Kruskal-Wallis)</td></tr>
+<tr><td>Relationship</td><td>2 numeric</td><td>Pearson (Spearman) correlation</td></tr>
+<tr><td>Predict outcome</td><td>numeric outcome, 1+ predictors</td><td>Linear regression</td></tr>
+<tr><td>Association</td><td>2 categorical</td><td>Chi-square (Fisher if small counts)</td></tr>
+<tr><td>Scale consistency</td><td>3+ items</td><td>Cronbach's alpha</td></tr></table></div></div>
+<div class="card" id="topics"></div>
+</div>
+</div>
+
+<script>
+var Billing=(function(){
+var K='analytica_pro',U='analytica_uses',FREE=['desc','ttest','corr'],LIMIT=3,RCKEY='goog_REPLACE_WITH_REVENUECAT_PUBLIC_KEY';
+function RC(){return window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Purchases}
+function pro(){try{return localStorage.getItem(K)==='1'}catch(e){return false}}
+function setPro(v){try{localStorage.setItem(K,v?'1':'0')}catch(e){}}
+function uses(){try{var u=JSON.parse(localStorage.getItem(U)||'{}');return u.d===new Date().toDateString()?u.n:0}catch(e){return 0}}
+function bump(){try{localStorage.setItem(U,JSON.stringify({d:new Date().toDateString(),n:uses()+1}))}catch(e){}}
+function gate(A,N){if(pro())return true;if(FREE.indexOf(A)<0){show(N+' is a Pro analysis.');return false}if(uses()>=LIMIT){show('You have used your '+LIMIT+' free analyses today.');return false}bump();return true}
+async function sync(){var p=RC();if(!p)return;try{var r=await p.getCustomerInfo();var on=!!r.customerInfo.entitlements.active.pro;if(on!==pro()){setPro(on);location.reload()}}catch(e){}}
+async function init(){var p=RC();if(!p)return;try{await p.configure({apiKey:RCKEY});sync()}catch(e){}}
+async function buy(type){var p=RC();if(p){try{var o=await p.getOfferings(),pk=o.current.availablePackages.filter(function(x){return x.packageType===type})[0];await p.purchasePackage({aPackage:pk});await sync()}catch(e){if(!e||!e.userCancelled)alert('Purchase failed. Please try again.')}return}
+if(confirm('DEMO MODE (browser): simulate a Pro purchase? Real billing runs only in the Android app.')){setPro(true);location.reload()}}
+async function restore(){var p=RC();if(p){try{await p.restorePurchases();await sync()}catch(e){}}else alert('Restore works in the Android app.')}
+function close(){var m=document.getElementById('mo');if(m)m.remove()}
+function show(msg){close();var d=document.createElement('div');d.className='mo';d.id='mo';d.onclick=function(e){if(e.target==d)close()};
+d.innerHTML='<div class="ms"><h3>Analytica Pro</h3><p class="mu" style="margin:0 0 8px">'+(msg||'Unlock the full toolkit.')+'</p><p style="margin:0 0 8px;font:13px system-ui,sans-serif">✓ All analyses (ANOVA, regression, chi-square, reliability)<br>✓ SPSS and R code with copy<br>✓ Unlimited runs<br>✓ MPhil and PhD lessons</p>'+
+(pro()?'<p><b>You are Pro.</b></p>':'<button class="pl b" onclick="Billing.buy(\'ANNUAL\')">Yearly <small>Best value · price shown by Google Play</small></button><button class="pl" onclick="Billing.buy(\'MONTHLY\')">Monthly <small>Cancel anytime in Google Play</small></button>')+
+'<div class="row"><button class="btn g" onclick="Billing.restore()">Restore purchases</button><button class="btn g" onclick="Billing.close()">Not now</button></div></div>';document.body.appendChild(d)}
+document.addEventListener('DOMContentLoaded',function(){init();var b=document.getElementById('pb');if(b&&pro()){b.textContent='Pro ✓';b.className='btn g'}});
+return{pro:pro,gate:gate,buy:buy,restore:restore,show:show,close:close}})();
+if('serviceWorker' in navigator&&location.protocol.indexOf('http')==0)navigator.serviceWorker.register('sw.js').catch(function(){});
+var level='Undergraduate\',D=null;
+var LV=['Undergraduate','MPhil','PhD'];
+var $=function(i){return document.getElementById(i)};
+function lvBtns(){$('lv').innerHTML=LV.map(function(l){return '<button class="chip'+(l==level?' on':'')+'" onclick="level=\''+l+'\';lvBtns()">'+l+'</button>'}).join('')}lvBtns();
+function tab(n){$('p1').style.display=n==1?'':'none';$('p2').style.display=n==2?'':'none';$('t1').className=n==1?'on':'';$('t2').className=n==2?'on':''}
+function sample(){var g=['Lecture','Flipped','Online'],s='method,score,study_hours\n';for(var i=0;i<30;i++){var k=i%3,h=3+((i*7)%9);s+=g[k]+','+Math.round(55+k*5+h*1.6+((i*13)%11))+','+h+'\n'}$('dat').value=s;$('ins').value='Does exam score differ between teaching methods, and is study hours related to score?'}
+$('fl').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){$('dat').value=r.result};r.readAsText(f)};
+
+function parse(t){var L=t.trim().split(/\r?\n/).filter(Boolean);if(L.length<3)return null;var d=L[0].indexOf('\t')>-1?'\t':',';
+var h=L[0].split(d).map(function(x){return x.trim().replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'')||'v'});
+var rows=L.slice(1).map(function(l){return l.split(d).map(function(x){return x.trim()})});
+var cols=h.map(function(n,j){var v=rows.map(function(r){return r[j]}).filter(function(x){return x!==''&&x!==undefined});
+var nums=v.filter(function(x){return !isNaN(+x)});var isN=nums.length>=.8*v.length&&new Set(v).size>Math.min(6,v.length/3);
+return{name:n,j:j,num:isN,lev:[...new Set(v)]}});return{h:h,rows:rows,cols:cols}}
+function mean(a){return a.reduce(function(s,x){return s+x},0)/a.length}
+function vr(a){var m=mean(a);return a.reduce(function(s,x){return s+(x-m)*(x-m)},0)/(a.length-1)}
+function f(x,d){return isFinite(x)?(+x).toFixed(d==null?2:d):'–'}
+function pf(p){return p<.001?'p < .001':'p = '+f(p,3)}
+function colv(c){return D.rows.map(function(r){return +r[c.j]}).filter(function(x){return !isNaN(x)})}
+
+function run(){D=parse($('dat').value);var o=$('out');if(!D){o.innerHTML='<div class="card wa">Please paste data with a header row and at least 2 data rows.</div>';return}
+var ins=$('ins').value.toLowerCase(),nu=D.cols.filter(function(c){return c.num}),ca=D.cols.filter(function(c){return !c.num&&c.lev.length>=2&&c.lev.length<=10});
+var named=nu.filter(function(c){return ins.indexOf(c.name.toLowerCase().replace(/_/g,' '))>-1||ins.indexOf(c.name.toLowerCase())>-1});
+var y=named[0]||nu[0],n=D.rows.length,cmp=/differ|compar|between|versus| vs |effect of|than/.test(ins),rel=/relat|associat|correl|predict|affect|influenc|impact|regress/.test(ins),rely=/reliab|cronbach|scale|consisten/.test(ins);
+var A,live='',steps='';
+// decide analysis
+if(rely&&nu.length>=3)A='alpha';
+else if(cmp&&ca.length&&nu.length)A=ca[0].lev.length==2?'ttest':'anova';
+else if(rel&&nu.length>=3&&/predict|affect|influenc|impact|regress/.test(ins))A='reg';
+else if(rel&&nu.length>=2)A='corr';
+else if(ca.length>=2&&!nu.length)A='chi';
+else if(ca.length&&nu.length)A=ca[0].lev.length==2?'ttest':'anova';
+else if(nu.length>=2)A='corr';else A='desc';
+var N={ttest:'Independent-samples t-test (Welch)',anova:'One-way ANOVA',corr:'Pearson correlation',reg:'Multiple linear regression',chi:'Chi-square test of independence',alpha:"Cronbach's alpha",desc:'Descriptive statistics'}[A];
+var g=ca[0],x=nu.filter(function(c){return c!=y})[0],y_=y&&y.name;
+if(!Billing.gate(A,N))return;
+// descriptives
+var dt='<table><tr><th>Variable</th><th>n</th><th>Mean</th><th>SD</th><th>Min</th><th>Max</th></tr>'+nu.map(function(c){var v=colv(c);return '<tr><td>'+c.name+'</td><td>'+v.length+'</td><td>'+f(mean(v))+'</td><td>'+f(Math.sqrt(vr(v)))+'</td><td>'+f(Math.min.apply(0,v))+'</td><td>'+f(Math.max.apply(0,v))+'</td></tr>'}).join('')+'</table>';
+var apa='',assum='';
+if(A=='ttest'||A=='anova'){var gs=g.lev.map(function(l){return D.rows.filter(function(r){return r[g.j]===l}).map(function(r){return +r[y.j]}).filter(function(v){return !isNaN(v)})});
+live='<table><tr><th>'+g.name+'</th><th>n</th><th>Mean</th><th>SD</th></tr>'+g.lev.map(function(l,i){return '<tr><td>'+l+'</td><td>'+gs[i].length+'</td><td>'+f(mean(gs[i]))+'</td><td>'+f(Math.sqrt(vr(gs[i])))+'</td></tr>'}).join('')+'</table>';
+if(A=='ttest'){var a=gs[0],b=gs[1],se=vr(a)/a.length+vr(b)/b.length,t=(mean(a)-mean(b))/Math.sqrt(se),df=se*se/(Math.pow(vr(a)/a.length,2)/(a.length-1)+Math.pow(vr(b)/b.length,2)/(b.length-1)),p=2*(1-jStat.studentt.cdf(Math.abs(t),df)),sp=Math.sqrt(((a.length-1)*vr(a)+(b.length-1)*vr(b))/(a.length+b.length-2)),d=(mean(a)-mean(b))/sp;
+apa='t('+f(df,1)+') = '+f(t)+', '+pf(p)+", Cohen's d = "+f(d);live+='<p><b>'+apa+'</b></p>'}
+else{var all=[].concat.apply([],gs),gm=mean(all),ssb=0,ssw=0;gs.forEach(function(v){ssb+=v.length*Math.pow(mean(v)-gm,2);v.forEach(function(q){ssw+=Math.pow(q-mean(v),2)})});var d1=gs.length-1,d2=all.length-gs.length,F=(ssb/d1)/(ssw/d2),p=1-jStat.centralF.cdf(F,d1,d2);apa='F('+d1+', '+d2+') = '+f(F)+', '+pf(p)+', η² = '+f(ssb/(ssb+ssw));live+='<p><b>'+apa+'</b></p>'}
+assum='Independent observations; roughly normal scores within each group; for ANOVA, similar variances (Levene\'s test).'}
+if(A=='corr'||A=='reg'){var X=x||nu[1],pr=D.rows.map(function(r){return[+r[X.j],+r[y.j]]}).filter(function(q){return !isNaN(q[0])&&!isNaN(q[1])}),xs=pr.map(function(q){return q[0]}),ys=pr.map(function(q){return q[1]}),mx=mean(xs),my=mean(ys),sxy=0;pr.forEach(function(q){sxy+=(q[0]-mx)*(q[1]-my)});var r=sxy/Math.sqrt(vr(xs)*vr(ys))/(pr.length-1),t=r*Math.sqrt((pr.length-2)/(1-r*r)),p=2*(1-jStat.studentt.cdf(Math.abs(t),pr.length-2)),sl=r*Math.sqrt(vr(ys)/vr(xs));
+apa='r('+(pr.length-2)+') = '+f(r)+', '+pf(p)+', R² = '+f(r*r);live='<p><b>'+X.name+' vs '+y.name+':</b> '+apa+'. Slope = '+f(sl)+(A=='reg'?' <span class="mu">(simple model shown live; full multiple regression in the code below)</span>':'')+'</p>';assum='Linear relationship, no extreme outliers, roughly normal residuals'+(A=='reg'?', no multicollinearity (check VIF)':'')+'.'}
+if(A=='chi'){var c1=ca[0],c2=ca[1],tb={},rt={},ct={},T=0;D.rows.forEach(function(r){var a=r[c1.j],b=r[c2.j];if(!a||!b)return;tb[a+'|'+b]=(tb[a+'|'+b]||0)+1;rt[a]=(rt[a]||0)+1;ct[b]=(ct[b]||0)+1;T++});var X2=0;Object.keys(rt).forEach(function(a){Object.keys(ct).forEach(function(b){var e=rt[a]*ct[b]/T;X2+=Math.pow((tb[a+'|'+b]||0)-e,2)/e})});var df=(Object.keys(rt).length-1)*(Object.keys(ct).length-1),p=1-jStat.chisquare.cdf(X2,df),V=Math.sqrt(X2/(T*(Math.min(Object.keys(rt).length,Object.keys(ct).length)-1)));apa='χ²('+df+', N = '+T+') = '+f(X2)+', '+pf(p)+', Cramér\'s V = '+f(V);live='<p><b>'+apa+'</b></p>';assum='Independent observations; expected count ≥ 5 in most cells.'}
+if(A=='alpha'){var k=nu.length,V=nu.map(function(c){return vr(colv(c))}),tot=D.rows.map(function(r){return nu.reduce(function(s,c){return s+(+r[c.j]||0)},0)}),al=k/(k-1)*(1-V.reduce(function(a,b){return a+b},0)/vr(tot));apa='α = '+f(al);live='<p><b>'+apa+'</b> across '+k+' items</p>';assum='Items measure one construct and are scored in the same direction (reverse-code first).'}
+if(A=='desc'){live='';assum='Check for outliers and data-entry errors first.'}
+// tool scoring
+var S={ttest:[6,9,9],anova:[6,9,9],corr:[7,9,9],reg:[4,9,10],chi:[4,9,9],alpha:[2,9,9],desc:[9,8,8]}[A].slice();// excel,spss,r
+if(level=='Undergraduate'){S[0]+=1;S[1]+=1}if(level=='PhD'){S[2]+=2;S[0]-=1}if(level=='MPhil'){S[2]+=1}
+if(/mixed|multilevel|sem\b|bootstrap|machine|reproduc|package|simulation|bayes/.test(ins))S[2]+=3;
+if(/click|simple|quick|pivot|chart|spreadsheet/.test(ins)){S[0]+=2}
+if(/survey|psycholog|likert|spss/.test(ins))S[1]+=1;
+if(n>10000){S[0]-=4;S[2]+=2}
+S=S.map(function(v){return Math.max(1,Math.min(10,v))});var nm=['Excel','SPSS','R'],bi=S.indexOf(Math.max.apply(0,S));if(S[2]==S[bi]&&level!='Undergraduate')bi=2;
+var why={0:'Fastest for small datasets and quick checks; everyone already has it, and you can chart as you go.',1:'Menu-driven and produces exam-ready output tables with assumption tests built in, ideal for standard tests and thesis-style reporting.',2:'Fully scriptable, reproducible and extendable, so it suits rigorous or publishable work and any later extensions.'}[bi];
+// code
+var yy=y_||'outcome',gg=g?g.name:'group',xx=(x||nu[1]||{name:'x'}).name,pn=nu.map(function(c){return c.name}).filter(function(c){return c!=yy}),C={};
+var rd='df <- read.csv("data.csv")\n';
+if(A=='ttest'){C.spss='T-TEST GROUPS='+gg+'('+g.lev[0]+' '+g.lev[1]+')\n  /VARIABLES='+yy+'\n  /CRITERIA=CI(.95).';C.r=rd+'df$'+gg+' <- factor(df$'+gg+')\nt.test('+yy+' ~ '+gg+', data = df)\n# effect size\nlibrary(effectsize); cohens_d('+yy+' ~ '+gg+', data = df)\nshapiro.test(df$'+yy+')';C.x='1. Sort/filter rows into two columns by '+gg+'\n2. =T.TEST(range1, range2, 2, 3)  → two-tailed Welch p-value\n3. Or Data > Data Analysis > t-Test: Two-Sample Assuming Unequal Variances\n4. Cohen\'s d: =(AVERAGE(r1)-AVERAGE(r2))/pooled SD'}
+else if(A=='anova'){C.spss='ONEWAY '+yy+' BY '+gg+'\n  /STATISTICS DESCRIPTIVES HOMOGENEITY\n  /POSTHOC=TUKEY ALPHA(0.05).';C.r=rd+'df$'+gg+' <- factor(df$'+gg+')\nfit <- aov('+yy+' ~ '+gg+', data = df)\nsummary(fit)\nTukeyHSD(fit)\nbartlett.test('+yy+' ~ '+gg+', data = df)';C.x='1. Put each group in its own column\n2. Data > Data Analysis > Anova: Single Factor\n3. Read F and P-value from the output\n4. Post hoc tests are not built in; use R or SPSS for Tukey'}
+else if(A=='corr'){C.spss='CORRELATIONS\n  /VARIABLES='+yy+' '+xx+'\n  /PRINT=TWOTAIL NOSIG.\nGRAPH /SCATTERPLOT='+xx+' WITH '+yy+'.';C.r=rd+'cor.test(df$'+yy+', df$'+xx+')\n# non-normal? use method = "spearman"\nplot(df$'+xx+', df$'+yy+'); abline(lm('+yy+' ~ '+xx+', data = df))';C.x='1. =CORREL(A2:A31, B2:B31) for r\n2. p-value: t = r*SQRT((n-2)/(1-r^2)); =T.DIST.2T(ABS(t), n-2)\n3. Insert > Scatter chart, add trendline with R²'}
+else if(A=='reg'){C.spss='REGRESSION\n  /DEPENDENT '+yy+'\n  /METHOD=ENTER '+pn.join(' ')+'\n  /STATISTICS COEFF R ANOVA COLLIN TOL.';C.r=rd+'fit <- lm('+yy+' ~ '+pn.join(' + ')+', data = df)\nsummary(fit)\nconfint(fit)\nlibrary(car); vif(fit)\nplot(fit)';C.x='1. Data > Data Analysis > Regression\n2. Y range = '+yy+', X range = predictor columns (adjacent)\n3. Tick Residuals and Residual Plots\n4. Collinearity checks are manual; prefer R or SPSS for 3+ predictors'}
+else if(A=='chi'){var c2n=ca[1].name;C.spss='CROSSTABS\n  /TABLES='+gg+' BY '+c2n+'\n  /STATISTICS=CHISQ PHI\n  /CELLS=COUNT EXPECTED.';C.r=rd+'tab <- table(df$'+gg+', df$'+c2n+')\nchisq.test(tab)\nchisq.test(tab)$expected   # check >= 5\nlibrary(rcompanion); cramerV(tab)';C.x='1. Insert > PivotTable: rows = '+gg+', columns = '+c2n+', values = count\n2. Build an expected-counts table\n3. =CHISQ.TEST(observed, expected)'}
+else if(A=='alpha'){var it=nu.map(function(c){return c.name});C.spss='RELIABILITY\n  /VARIABLES='+it.join(' ')+'\n  /MODEL=ALPHA\n  /SUMMARY=TOTAL.';C.r=rd+'library(psych)\nalpha(df[, c("'+it.join('", "')+'")])';C.x='1. Compute each item variance with =VAR.S()\n2. Compute variance of the row totals\n3. α = k/(k-1) × (1 − Σ item var / total var)'}
+else{C.spss='DESCRIPTIVES VARIABLES='+nu.map(function(c){return c.name}).join(' ')+'\n  /STATISTICS=MEAN STDDEV MIN MAX.\nFREQUENCIES VARIABLES=ALL.';C.r=rd+'summary(df)\nlibrary(psych); describe(df)';C.x='=AVERAGE(), =STDEV.S(), =MIN(), =MAX(); or Data > Data Analysis > Descriptive Statistics'}
+window.C=C;
+var dep={Undergraduate:'Report the test statistic, p-value and an effect size, then say in plain words what it means.',MPhil:'Check assumptions explicitly, report effect sizes with 95% CIs, and justify the test in your methods section.',PhD:'Pre-register or document the analysis plan, consider robust or non-parametric alternatives, correct for multiple tests, and keep a reproducible script.'}[level];
+var sig=apa&&/p < \.001|p = 0\.0[0-4]|p = 0\.0[0-4]/.test(apa)?'The result is statistically significant at α = .05.':apa?'The result is not statistically significant at α = .05.':'';
+o.innerHTML='<div class="card"><span class="tag">'+level+'</span><span class="tag">'+n+' rows</span><span class="tag">'+nu.length+' numeric / '+ca.length+' categorical</span><h3 style="margin-top:8px">Recommended analysis: '+N+'</h3><p class="mu">Assumptions: '+assum+'</p></div>'+
+'<div class="g2"><div class="card pick"><label>Best tool</label><h3>'+nm[bi]+'</h3><p style="margin:0">'+why+'</p></div><div class="card"><label>Tool fit</label>'+nm.map(function(t,i){return '<div class="sc'+(i==bi?' top':'')+'"><b>'+t+'</b><div class="bar"><i style="width:'+S[i]*10+'%"></i></div>'+S[i]+'/10</div>'}).join('')+'</div></div>'+
+'<div class="card"><label>Live results (computed here)</label><div class="ov">'+dt+'</div><div class="ov" style="margin-top:10px">'+live+'</div>'+(apa?'<p class="mu">'+sig+' Always interpret alongside the effect size and your research context.</p>':'')+'</div>'+
+'<div class="card"><label>Run it in your tool</label><div class="row" id="ct"></div><pre id="cc"></pre><p class="mu" style="margin-bottom:0">Note: SPSS and R run on your computer. Copy this ready-made syntax into your own installation.</p></div>'+
+'<div class="card"><label>Guidance for '+level+' students</label><p style="margin:0">'+dep+'</p></div>';
+code(bi==0?'x':bi==1?'spss':'r')}
+function code(k){var nmz={spss:'SPSS syntax',r:'R code',x:'Excel steps'};$('ct').innerHTML=['spss','r','x'].map(function(q){return '<button class="chip'+(q==k?' on':'')+'" onclick="code(\''+q+'\')">'+nmz[q]+'</button>'}).join('')+'<button class="btn g" onclick="Billing.pro()&&navigator.clipboard&&navigator.clipboard.writeText(window.C[\''+k+'\'])">Copy</button>';$('cc').textContent=(!Billing.pro()&&k!='x')?'🔒 SPSS and R code are part of Analytica Pro.':window.C[k]}
+
+var TP=[['What a p-value really is','U','The probability of seeing data at least this extreme if there were truly no effect. It is not the probability the hypothesis is true, and it says nothing about how big or important the effect is.'],
+['Effect sizes','U','Report how large an effect is: Cohen\'s d (0.2 small, 0.5 medium, 0.8 large), r, η², or Cramér\'s V. Significance depends on sample size, effect size does not.'],
+['Variable types','U','Nominal (categories), ordinal (ranked), interval/ratio (numeric). The type of your variables decides which tests are valid.'],
+['Checking assumptions','M','Test normality with Shapiro-Wilk plus Q-Q plots, homogeneity with Levene, and look for outliers. If violated, use Welch, a transformation, or a non-parametric test.'],
+['Sample size and power','M','Plan the sample before collecting data. Power of 0.80 at α = .05 is conventional; use G*Power or R\'s pwr package to compute n for your expected effect.'],
+['Confidence intervals','M','A 95% CI shows the plausible range of the true value, which is more informative than a bare p-value. Report both.'],
+['Multiple comparisons','P','Running many tests inflates false positives. Use Bonferroni, Holm or false discovery rate control, and state your family of tests in advance.'],
+['Mixed and multilevel models','P','Nested or repeated data (students in schools, repeated measures) violate independence. Use lme4 in R or MIXED in SPSS, with random intercepts as a start.'],
+['Reproducible workflow','P','Script everything (R Markdown/Quarto), version your data, set seeds, and never edit raw data by hand. Reviewers and your future self will thank you.'],
+['SPSS vs R vs Excel','U','Excel: quick looks and small data. SPSS: standard tests, point-and-click, fast learning curve. R: flexibility, advanced models, free and reproducible.']];
+var LN={U:'Undergraduate',M:'MPhil',P:'PhD'};
+$('topics').innerHTML='<h3>Concept library</h3>'+TP.map(function(t){return '<details><summary>'+t[0]+' <span class="tag">'+LN[t[1]]+'</span></summary><p class="mu" style="margin:6px 0 0">'+(t[1]=='P'&&!Billing.pro()?'🔒 Pro lesson. Upgrade to read.':t[2])+'</p></details>'}).join('');
+</script></body></html>
